@@ -9,7 +9,7 @@ import { unified } from 'unified';
 export async function POST(req: Request) {
   const { markdown, extention } = await req.json();
 
-  // 转换 Markdown 为 HTML
+  // convert Markdown to HTML
   const file = await unified().use(remarkParse).use(remarkHtml).process(markdown);
   var fileBuffer = null;
   if (extention === 'pdf') {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       ${String(file)}
     `;
 
-    // 使用 Puppeteer 生成 PDF
+    // Generate PDF
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(styledHtml);
