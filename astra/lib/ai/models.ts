@@ -1,12 +1,17 @@
 import { openai } from '@ai-sdk/openai';
 import { fireworks } from '@ai-sdk/fireworks';
-import { deepseek } from '@ai-sdk/deepseek';
+import { createDeepSeek } from '@ai-sdk/deepseek';
 
 import {
   customProvider,
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
+
+const deepseek = createDeepSeek({
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: process.env.DEEPSEEK_BASE_URL
+})
 
 export const DEFAULT_CHAT_MODEL: string = 'chat-model-reasoning';
 
@@ -18,8 +23,8 @@ export const myProvider = customProvider({
       model: fireworks('accounts/fireworks/models/deepseek-r1'),
       middleware: extractReasoningMiddleware({ tagName: 'think' }),
     }),
-    'chat-model-reasoning': deepseek('deepseek-reasoner'),
-    'title-model': deepseek('deepseek-chat'),
+    'chat-model-reasoning': deepseek('deepseek-r1-250120'),
+    'title-model': deepseek('deepseek-r1-250120'),
     'block-model': openai('gpt-4o-mini'),
   },
   imageModels: {

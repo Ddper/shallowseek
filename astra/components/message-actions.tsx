@@ -15,6 +15,7 @@ import {
 } from './ui/tooltip';
 import { memo } from 'react';
 import equal from 'fast-deep-equal';
+import { FileDown } from 'lucide-react';
 
 export function PureMessageActions({
   chatId,
@@ -38,22 +39,6 @@ export function PureMessageActions({
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex flex-row gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="py-1 px-2 h-fit text-muted-foreground"
-              variant="outline"
-              onClick={async () => {
-                await copyToClipboard(message.content as string);
-                toast.success('Copied to clipboard!');
-              }}
-            >
-              <CopyIcon />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Copy</TooltipContent>
-        </Tooltip>
-
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -156,6 +141,53 @@ export function PureMessageActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Downvote Response</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="py-1 px-2 h-fit text-muted-foreground"
+              variant="outline"
+              onClick={async () => {
+                await copyToClipboard(message.content as string);
+                toast.success('Copied to clipboard!');
+              }}
+            >
+              <CopyIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Copy</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="py-1 px-2 h-fit text-muted-foreground"
+              variant="outline"
+              onClick={async () => {
+                const extention = 'docx';
+                const response = await fetch('/api/convert', {
+                  method: 'POST',
+                  body: JSON.stringify({ markdown: message.content, extention: extention }),
+                });
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${message.id}.${extention}`;
+                  a.click();
+                  toast.success(`${extention} Generated!`);
+                  a.remove();
+                } else {
+                  toast.error('Download failed!')
+                }
+              }}
+            >
+            <FileDown />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Convert to docx</TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>
